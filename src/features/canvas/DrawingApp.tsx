@@ -4,6 +4,8 @@ import { SHAPE_TYPE } from '../../entities/canvas/types';
 
 import type { KonvaDrawingTool, KonvaShape } from './konva-drawing-tool';
 
+import Toolbar from './ToolBar';
+
 interface DrawingAppProps {
 	drawingTool: KonvaDrawingTool;
 	containerRef: React.RefObject<HTMLDivElement>;
@@ -143,30 +145,14 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 
 	return (
 		<div style={{ padding: '10%' }}>
-			<div>
-				<button onClick={() => handleToolChange(SHAPE_TYPE.RECT)}>
-					Rectangle
-				</button>
-				<button onClick={() => handleToolChange(SHAPE_TYPE.CIRCLE)}>
-					Circle
-				</button>
-				<button onClick={() => handleToolChange(SHAPE_TYPE.POLYGON)}>
-					Polygon
-				</button>
-				<button onClick={() => handleToolChange(SHAPE_TYPE.LINE)}>Line</button>
-				<button onClick={() => handleToolChange(SHAPE_TYPE.CURVE)}>
-					Curve
-				</button>
-
-				<input type="color" value={fillColor} onChange={handleColorChange} />
-				<input
-					type="range"
-					min="1"
-					max="20"
-					value={strokeWidth}
-					onChange={handleStrokeWidthChange}
-				/>
-			</div>
+			<Toolbar
+				selectedTool={selectedTool}
+				onToolChange={handleToolChange}
+				fillColor={fillColor}
+				onColorChange={handleColorChange}
+				strokeWidth={strokeWidth}
+				onStrokeWidthChange={handleStrokeWidthChange}
+			/>
 			<div
 				ref={containerRef}
 				onMouseDown={handleMouseDown}
