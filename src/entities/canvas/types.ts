@@ -15,7 +15,12 @@ export interface DrawingTool {
 export enum SHAPE_TYPE {
 	RECT = 'rect',
 	CIRCLE = 'circle',
-	POLYGON = 'polygon',
+	POLYGON = 'regularpolygon',
 	LINE = 'line',
 	CURVE = 'curve',
+}
+
+export interface ShapeData {
+	type: SHAPE_TYPE;
+	props: any;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import DrawingApp from '@/features/canvas/DrawingApp';
-import { KonvaDrawingTool } from '@/features/canvas/konva-drawing-tool';
+import { KonvaDrawingTool } from '@/features/canvas/KonvaDrawingTool';
 
 function Home() {
 	const containerRef = useRef<HTMLDivElement>(null);

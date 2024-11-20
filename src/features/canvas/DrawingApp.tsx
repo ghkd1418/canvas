@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { SHAPE_TYPE } from '../../entities/canvas/types';
 
-import type { KonvaDrawingTool, KonvaShape } from './konva-drawing-tool';
+import type { KonvaShape } from './KonvaShape';
+
+import type { KonvaDrawingTool } from './KonvaDrawingTool';
 
 import Toolbar from './ToolBar';
 
@@ -154,6 +156,7 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 				strokeWidth={strokeWidth}
 				onStrokeWidthChange={handleStrokeWidthChange}
 			/>
+
 			<div
 				ref={containerRef}
 				onMouseDown={handleMouseDown}
