@@ -14,6 +14,7 @@ interface DrawingAppProps {
 const DEFAULT_STROKE_WIDTH = 5;
 const DEFAULT_FILL_COLOR = '#169f8c';
 const DEFAULT_STROKE_COLOR = '#000000';
+
 const DEFAULT_SHAPE_WIDTH = 100;
 const DEFAULT_SHAPE_HEIGHT = 50;
 const DEFALT_POLYGON_SIDES = 5;

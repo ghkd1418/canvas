@@ -12,9 +12,15 @@ interface ToolbarProps {
 const shapeTypes = [
 	{ type: SHAPE_TYPE.RECT, label: 'Rectangle' },
 	{ type: SHAPE_TYPE.CIRCLE, label: 'Circle' },
+	{ type: SHAPE_TYPE.POLYGON, label: 'Polygon' },
 	{ type: SHAPE_TYPE.LINE, label: 'Line' },
 	{ type: SHAPE_TYPE.CURVE, label: 'Curve' },
 ];
+
+const STROKE_WIDTH_LIMITS = {
+	MIN: 5,
+	MAX: 50,
+} as const;
 
 function Toolbar({
 	selectedTool,
@@ -38,8 +44,8 @@ function Toolbar({
 			<input type="color" value={fillColor} onChange={onColorChange} />
 			<input
 				type="range"
-				min="1"
-				max="20"
+				min={STROKE_WIDTH_LIMITS.MIN}
+				max={STROKE_WIDTH_LIMITS.MAX}
 				value={strokeWidth}
 				onChange={onStrokeWidthChange}
 			/>
