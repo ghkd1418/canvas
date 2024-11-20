@@ -11,3 +11,13 @@
   - 현재 선택된 컬러를 사용자가 인지할 수 있어야 합니다.
 - Undo, Redo
   - 지난 작업으로 돌아갈 수 있어야 하고 마지막으로 작업한 시점으로 돌아올 수도 있어야 합니다.
+
+### 개발 서버 실행
+
+```bash
+yarn
+yarn dev
+```
+
+### 스크린샷
+<img width="966" alt="스크린샷 2024-11-20 오후 11 59 16" src="https://github.com/user-attachments/assets/3ca19984-a94d-4fbe-be49-6c8b9ddc14b1">
