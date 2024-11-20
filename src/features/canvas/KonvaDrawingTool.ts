@@ -41,12 +41,14 @@ export class KonvaDrawingTool implements DrawingTool {
 
 				try {
 					shape = this.createShape(normalizedType as SHAPE_TYPE, props);
-					this.layer.add(shape.getKonvaShape());
+
+					this.layer.add((shape as any).shape);
+
+					this.stage.add(this.layer);
 				} catch (error) {
 					console.warn('도형 생성 중 오류 발생:', error);
 				}
 			});
-			this.stage.add(this.layer);
 		}
 	}
 
@@ -60,7 +62,7 @@ export class KonvaDrawingTool implements DrawingTool {
 			case SHAPE_TYPE.CIRCLE:
 				shape = new Konva.Circle(props as CircleConfig);
 				break;
-			case SHAPE_TYPE.LINE:
+			case SHAPE_TYPE.LINE || SHAPE_TYPE.CURVE:
 				shape = new Konva.Line(props as LineConfig);
 				break;
 			case SHAPE_TYPE.CURVE:
@@ -99,7 +101,7 @@ export class KonvaDrawingTool implements DrawingTool {
 			// 로컬스토리지에 도형 제거
 			this.shapeStorage.removeShape({
 				type: shape.getKonvaShape().getClassName() as SHAPE_TYPE,
-				props: shape.getKonvaShape().getAttrs(),
+				props: { id: shape.getId(), ...shape.getKonvaShape().getAttrs() },
 			});
 		}
 	}

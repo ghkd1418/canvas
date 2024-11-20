@@ -34,22 +34,3 @@ export class ShapeStorage extends BaseStorage<ShapeData[]> {
 		this.deleteData();
 	}
 }
-/***
- * 
- * 
- * lineCap
-: 
-"round"
-lineJoin
-: 
-"round"
-points
-: 
-(4) [211.8828125, 227.6953125, 211.8828125, 227.6953125]
-stroke
-: 
-"#000000"
-strokeWidth
-: 
-5
- */

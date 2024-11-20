@@ -4,9 +4,19 @@ import type { Shape } from '@/entities/canvas/types';
 
 export class KonvaShape implements Shape {
 	private shape: Konva.Shape;
+	private id: string;
 
 	constructor(shape: Konva.Shape) {
 		this.shape = shape;
+		this.id = this.generateId();
+	}
+
+	private generateId(): string {
+		return 'shape-' + Math.random().toString(36).substring(2, 9);
+	}
+
+	getId() {
+		return this.id;
 	}
 
 	getKonvaShape() {

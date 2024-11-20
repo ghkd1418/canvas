@@ -29,6 +29,9 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 	const [fillColor, setFillColor] = useState<string>(DEFAULT_FILL_COLOR);
 	const [strokeWidth, setStrokeWidth] = useState<number>(DEFAULT_STROKE_WIDTH);
 
+	const undoStack = useRef<KonvaShape[]>([]);
+	const redoStack = useRef<KonvaShape[]>([]);
+
 	const handleToolChange = (tool: SHAPE_TYPE) => {
 		setSelectedTool(tool);
 	};
@@ -144,6 +147,31 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 		}
 
 		drawingTool.addShape(shape);
+
+		// 현재 작업을 undoStack에 추가
+		undoStack.current.push(shape);
+		// Redo 스택 초기화
+		redoStack.current.length = 0;
+	};
+
+	const handleUndo = () => {
+		if (undoStack.current.length > 0) {
+			const lastShape = undoStack.current.pop();
+			if (lastShape) {
+				drawingTool.removeShape(lastShape);
+				redoStack.current.push(lastShape);
+			}
+		}
+	};
+
+	const handleRedo = () => {
+		if (redoStack.current.length > 0) {
+			const lastRemovedShape = redoStack.current.pop();
+			if (lastRemovedShape) {
+				drawingTool.addShape(lastRemovedShape);
+				undoStack.current.push(lastRemovedShape);
+			}
+		}
 	};
 
 	return (
@@ -156,7 +184,8 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 				strokeWidth={strokeWidth}
 				onStrokeWidthChange={handleStrokeWidthChange}
 			/>
-
+			<button onClick={handleUndo}>Undo</button>
+			<button onClick={handleRedo}>Redo</button>
 			<div
 				ref={containerRef}
 				onMouseDown={handleMouseDown}
