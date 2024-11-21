@@ -85,6 +85,7 @@ export class KonvaDrawingTool implements DrawingTool {
 
 			// 로컬스토리지에 도형 추가
 			this.shapeStorage.addShape({
+				id: shape.getId(),
 				type: shape.getKonvaShape().getClassName() as SHAPE_TYPE,
 				props: shape.getKonvaShape().getAttrs(),
 			});
@@ -99,10 +100,7 @@ export class KonvaDrawingTool implements DrawingTool {
 			(shape as any).shape.remove();
 
 			// 로컬스토리지에 도형 제거
-			this.shapeStorage.removeShape({
-				type: shape.getKonvaShape().getClassName() as SHAPE_TYPE,
-				props: { id: shape.getId(), ...shape.getKonvaShape().getAttrs() },
-			});
+			this.shapeStorage.removeShape(shape.getId());
 		}
 	}
 
