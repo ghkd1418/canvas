@@ -2,6 +2,7 @@ import { BaseStorage } from '@/shared/utils/baseStorage';
 import type { SHAPE_TYPE } from './types';
 
 interface ShapeData {
+	id: string;
 	type: SHAPE_TYPE;
 	props: any;
 }
@@ -19,12 +20,11 @@ export class ShapeStorage extends BaseStorage<ShapeData[]> {
 		this.setData(shapes);
 	}
 
-	removeShape(shapeToRemove: ShapeData) {
+	removeShape(shapeToRemoveId: ShapeData['id']) {
 		const shapes = this.getData() || [];
+
 		const updatedShapes = shapes.filter(
-			(shape) =>
-				shape.type !== shapeToRemove.type ||
-				shape.props.id !== shapeToRemove.props.id,
+			(shape) => shape.id !== shapeToRemoveId,
 		);
 
 		this.setData(updatedShapes);
