@@ -19,7 +19,7 @@ const DEFAULT_STROKE_COLOR = '#000000';
 
 const DEFAULT_SHAPE_WIDTH = 100;
 const DEFAULT_SHAPE_HEIGHT = 50;
-const DEFALT_POLYGON_SIDES = 5;
+const DEFAULT_POLYGON_SIDES = 5;
 
 const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const [selectedTool, setSelectedTool] = useState<SHAPE_TYPE>(SHAPE_TYPE.RECT);
@@ -160,12 +160,14 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 				shape = drawingTool.createShape(SHAPE_TYPE.POLYGON, {
 					x: startX,
 					y: startY,
-					sides: DEFALT_POLYGON_SIDES,
+					sides: DEFAULT_POLYGON_SIDES,
 					radius: 50,
 					fill: fillColor,
 					stroke: DEFAULT_STROKE_COLOR,
 					strokeWidth: strokeWidth,
 				});
+				drawingTool.addShape(shape);
+				undoStack.current.push(shape);
 
 				break;
 			}
@@ -180,17 +182,11 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					strokeWidth: strokeWidth,
 				});
 
+				drawingTool.addShape(shape);
+				undoStack.current.push(shape);
+
 				break;
 			}
-		}
-
-		if (shape) {
-			drawingTool.addShape(shape);
-
-			// // 현재 작업을 undoStack에 추가
-			undoStack.current.push(shape);
-			// // Redo 스택 초기화
-			redoStack.current.length = 0;
 		}
 	};
 
