@@ -19,17 +19,15 @@ const DEFAULT_STROKE_COLOR = '#000000';
 
 const DEFAULT_SHAPE_WIDTH = 100;
 const DEFAULT_SHAPE_HEIGHT = 50;
-const DEFALT_POLYGON_SIDES = 5;
+const DEFAULT_POLYGON_SIDES = 5;
 
-const DrawingApp: React.FC<DrawingAppProps> = ({
-	containerRef,
-	drawingTool,
-}) => {
+const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const [selectedTool, setSelectedTool] = useState<SHAPE_TYPE>(SHAPE_TYPE.RECT);
 	const [fillColor, setFillColor] = useState<string>(DEFAULT_FILL_COLOR);
 	const [strokeWidth, setStrokeWidth] = useState<number>(DEFAULT_STROKE_WIDTH);
 
 	const undoStack = useRef<KonvaShape[]>([]);
+
 	const redoStack = useRef<KonvaShape[]>([]);
 
 	const handleToolChange = (tool: SHAPE_TYPE) => {
@@ -51,50 +49,75 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 		const startX = event.clientX - rect.left;
 		const startY = event.clientY - rect.top;
 
-		let shape: KonvaShape;
+		let shape: KonvaShape | null = null;
 
 		switch (selectedTool) {
 			case SHAPE_TYPE.LINE: {
-				shape = drawingTool.createShape(selectedTool, {
-					points: [startX, startY, startX, startY],
+				const tempShape = drawingTool.createShape(selectedTool, {
+					points: [startX, startY],
 					stroke: DEFAULT_STROKE_COLOR,
 					strokeWidth: strokeWidth,
 					lineCap: 'round',
 					lineJoin: 'round',
 				});
+				drawingTool.addShape(tempShape);
 
-				const handleMouseMove = (moveEvent: MouseEvent) => {
+				const handleMouseMoveHandler = (moveEvent: MouseEvent) => {
 					const endX = moveEvent.clientX - rect.left;
 					const endY = moveEvent.clientY - rect.top;
-					shape.points([startX, startY, endX, endY]);
-					shape.getKonvaShape().getLayer()?.batchDraw();
+					tempShape.points([startX, startY, endX, endY]);
 				};
 
-				const handleMouseUp = () => {
-					document.removeEventListener('mousemove', handleMouseMove);
-					document.removeEventListener('mouseup', handleMouseUp);
+				const handleMouseUpHandler = (upEvent: MouseEvent) => {
+					const endX = upEvent.clientX - rect.left;
+					const endY = upEvent.clientY - rect.top;
+
+					shape = drawingTool.createShape(selectedTool, {
+						points: [startX, startY, endX, endY],
+						stroke: DEFAULT_STROKE_COLOR,
+						strokeWidth: strokeWidth,
+						lineCap: 'round',
+						lineJoin: 'round',
+					});
+
+					if (tempShape) {
+						drawingTool.removeShape(tempShape);
+					}
+					drawingTool.addShape(shape);
+
+					undoStack.current.push(shape);
+
+					document.removeEventListener('mousemove', handleMouseMoveHandler);
+					document.removeEventListener('mouseup', handleMouseUpHandler);
 				};
 
-				document.addEventListener('mousemove', handleMouseMove);
-				document.addEventListener('mouseup', handleMouseUp);
+				document.addEventListener('mousemove', handleMouseMoveHandler);
+				document.addEventListener('mouseup', handleMouseUpHandler);
 
 				break;
 			}
 			case SHAPE_TYPE.CURVE: {
 				const points: number[] = [startX, startY];
-
-				shape = drawingTool.createShape(selectedTool, {
-					points: points,
-					stroke: DEFAULT_STROKE_COLOR,
-					strokeWidth: strokeWidth,
-					lineCap: 'round',
-					lineJoin: 'round',
-					tension: 0.5,
-				});
+				let tempShape: KonvaShape;
 
 				const handleMouseMove = (moveEvent: MouseEvent) => {
 					const endX = moveEvent.clientX - rect.left;
 					const endY = moveEvent.clientY - rect.top;
+
+					if (tempShape) {
+						tempShape.points(points);
+					} else {
+						tempShape = drawingTool.createShape(selectedTool, {
+							points: points,
+							stroke: DEFAULT_STROKE_COLOR,
+							strokeWidth: strokeWidth,
+							lineCap: 'round',
+							lineJoin: 'round',
+							tension: 0.5,
+						});
+
+						drawingTool.addShape(tempShape);
+					}
 
 					if (points.length > 2) {
 						points.push(
@@ -104,11 +127,26 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 					}
 
 					points.push(endX, endY);
-
-					shape.points(points);
+					shape?.points(points);
 				};
 
 				const handleMouseUp = () => {
+					shape = drawingTool.createShape(selectedTool, {
+						points: points,
+						stroke: DEFAULT_STROKE_COLOR,
+						strokeWidth: strokeWidth,
+						lineCap: 'round',
+						lineJoin: 'round',
+						tension: 0.5,
+					});
+
+					if (tempShape) {
+						drawingTool.removeShape(tempShape);
+					}
+					drawingTool.addShape(shape);
+
+					undoStack.current.push(shape);
+
 					document.removeEventListener('mousemove', handleMouseMove);
 					document.removeEventListener('mouseup', handleMouseUp);
 				};
@@ -122,12 +160,14 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 				shape = drawingTool.createShape(SHAPE_TYPE.POLYGON, {
 					x: startX,
 					y: startY,
-					sides: DEFALT_POLYGON_SIDES,
+					sides: DEFAULT_POLYGON_SIDES,
 					radius: 50,
 					fill: fillColor,
 					stroke: DEFAULT_STROKE_COLOR,
 					strokeWidth: strokeWidth,
 				});
+				drawingTool.addShape(shape);
+				undoStack.current.push(shape);
 
 				break;
 			}
@@ -142,16 +182,12 @@ const DrawingApp: React.FC<DrawingAppProps> = ({
 					strokeWidth: strokeWidth,
 				});
 
+				drawingTool.addShape(shape);
+				undoStack.current.push(shape);
+
 				break;
 			}
 		}
-
-		drawingTool.addShape(shape);
-
-		// 현재 작업을 undoStack에 추가
-		undoStack.current.push(shape);
-		// Redo 스택 초기화
-		redoStack.current.length = 0;
 	};
 
 	const handleUndo = () => {
