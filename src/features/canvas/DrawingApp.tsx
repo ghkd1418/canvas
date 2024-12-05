@@ -1,25 +1,26 @@
 import React, { useRef, useState } from 'react';
+import { Redo2, Undo2 } from 'lucide-react';
 
 import { SHAPE_TYPE } from '../../entities/canvas/types';
+import Toolbar from './ToolBar';
 
-import type { KonvaShape } from './KonvaShape';
+import * as styles from '@/features/canvas/drawing.css';
 
 import type { KonvaDrawingTool } from './KonvaDrawingTool';
-
-import Toolbar from './ToolBar';
+import type { KonvaShape } from './KonvaShape';
 
 interface DrawingAppProps {
 	drawingTool: KonvaDrawingTool;
 	containerRef: React.RefObject<HTMLDivElement>;
 }
 
-const DEFAULT_STROKE_WIDTH = 5;
 const DEFAULT_FILL_COLOR = '#169f8c';
 const DEFAULT_STROKE_COLOR = '#000000';
 
 const DEFAULT_SHAPE_WIDTH = 100;
 const DEFAULT_SHAPE_HEIGHT = 50;
 const DEFAULT_POLYGON_SIDES = 5;
+const DEFAULT_STROKE_WIDTH = 1;
 
 const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const [selectedTool, setSelectedTool] = useState<SHAPE_TYPE>(SHAPE_TYPE.RECT);
@@ -211,25 +212,34 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	};
 
 	return (
-		<div style={{ padding: '10%' }}>
-			<Toolbar
-				selectedTool={selectedTool}
-				onToolChange={handleToolChange}
-				fillColor={fillColor}
-				onColorChange={handleColorChange}
-				strokeWidth={strokeWidth}
-				onStrokeWidthChange={handleStrokeWidthChange}
-			/>
-			<button onClick={handleUndo}>Undo</button>
-			<button onClick={handleRedo}>Redo</button>
+		<div className={styles.canvas}>
+			<div className={styles.canvasKit}>
+				<Toolbar
+					selectedTool={selectedTool}
+					onToolChange={handleToolChange}
+					fillColor={fillColor}
+					onColorChange={handleColorChange}
+					strokeWidth={strokeWidth}
+					onStrokeWidthChange={handleStrokeWidthChange}
+				/>
+				<div className={styles.undoRedoContainer}>
+					<button className={styles.undoRedoButton} onClick={handleUndo}>
+						<Undo2 size={20} strokeWidth={2} />
+					</button>
+					<button className={styles.undoRedoButton} onClick={handleRedo}>
+						<Redo2 size={20} strokeWidth={2} />
+					</button>
+				</div>
+			</div>
+			<br />
 			<div
 				ref={containerRef}
 				onMouseDown={handleMouseDown}
 				style={{
 					width: window.innerWidth * 0.8,
 					height: window.innerHeight * 0.8,
-					border: '1px solid black',
 				}}
+				className={styles.stage}
 			/>
 		</div>
 	);
