@@ -16,4 +16,5 @@ yarn dev
 ```
 
 ### 스크린샷
-<img width="966" alt="스크린샷 2024-11-20 오후 11 59 16" src="https://github.com/user-attachments/assets/3ca19984-a94d-4fbe-be49-6c8b9ddc14b1">
+<img width="1252" alt="image" src="https://github.com/user-attachments/assets/a1ed2006-7269-440b-925b-8ebe806d76f2">
+
