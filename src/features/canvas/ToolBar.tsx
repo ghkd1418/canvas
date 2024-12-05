@@ -1,5 +1,9 @@
 import { SHAPE_TYPE } from '@/entities/canvas/types';
 
+import * as styles from '@/features/canvas/drawing.css';
+import { assignInlineVars } from '@vanilla-extract/dynamic';
+import { primaryColor } from '@/features/canvas/drawing.css';
+
 interface ToolbarProps {
 	selectedTool: SHAPE_TYPE;
 	onToolChange: (tool: SHAPE_TYPE) => void;
@@ -8,18 +12,26 @@ interface ToolbarProps {
 	strokeWidth: number;
 	onStrokeWidthChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+import {
+	Circle,
+	Minus,
+	Pencil,
+	Pentagon,
+	RectangleHorizontal,
+} from 'lucide-react';
+import { vars } from '@/shared/styles/vars.css';
 
-const shapeTypes = [
-	{ type: SHAPE_TYPE.RECT, label: 'Rectangle' },
-	{ type: SHAPE_TYPE.CIRCLE, label: 'Circle' },
-	{ type: SHAPE_TYPE.POLYGON, label: 'Polygon' },
-	{ type: SHAPE_TYPE.LINE, label: 'Line' },
-	{ type: SHAPE_TYPE.CURVE, label: 'Curve' },
+const SHAPE_DATA = [
+	{ type: SHAPE_TYPE.RECT, label: 'Rectangle', icon: <RectangleHorizontal /> },
+	{ type: SHAPE_TYPE.CIRCLE, label: 'Circle', icon: <Circle /> },
+	{ type: SHAPE_TYPE.POLYGON, label: 'Polygon', icon: <Pentagon /> },
+	{ type: SHAPE_TYPE.LINE, label: 'Line', icon: <Minus /> },
+	{ type: SHAPE_TYPE.CURVE, label: 'Curve', icon: <Pencil /> },
 ];
 
 const STROKE_WIDTH_LIMITS = {
-	MIN: 5,
-	MAX: 50,
+	MIN: 1,
+	MAX: 30,
 } as const;
 
 function Toolbar({
@@ -31,17 +43,28 @@ function Toolbar({
 	onStrokeWidthChange,
 }: ToolbarProps) {
 	return (
-		<div>
-			{shapeTypes.map(({ type, label }) => (
+		<div className={styles.toolbarContainer}>
+			{SHAPE_DATA.map(({ type, label, icon }) => (
 				<button
 					key={type}
 					onClick={() => onToolChange(type)}
-					className={selectedTool === type ? 'active' : ''}
+					className={styles.shapeButton}
+					style={assignInlineVars({
+						[primaryColor]:
+							selectedTool === type ? 'pink' : vars.color['gray-200'],
+					})}
+					title={label}
 				>
-					{label}
+					{icon}
 				</button>
 			))}
-			<input type="color" value={fillColor} onChange={onColorChange} />
+			<input
+				className={styles.colorPicker}
+				type="color"
+				value={fillColor}
+				onChange={onColorChange}
+			/>
+
 			<input
 				type="range"
 				min={STROKE_WIDTH_LIMITS.MIN}
