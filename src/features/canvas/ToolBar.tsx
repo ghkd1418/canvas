@@ -12,6 +12,7 @@ interface ToolbarProps {
 	strokeWidth: number;
 	onStrokeWidthChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
 import {
 	Circle,
 	Minus,
@@ -19,6 +20,7 @@ import {
 	Pentagon,
 	RectangleHorizontal,
 } from 'lucide-react';
+
 import { vars } from '@/shared/styles/vars.css';
 
 const SHAPE_DATA = [

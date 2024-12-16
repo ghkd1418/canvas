@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Redo2, Undo2 } from 'lucide-react';
 
 import { SHAPE_TYPE } from '../../entities/canvas/types';
@@ -8,6 +8,8 @@ import * as styles from '@/features/canvas/drawing.css';
 
 import type { KonvaDrawingTool } from './KonvaDrawingTool';
 import type { KonvaShape } from './KonvaShape';
+
+import useUndoRedo from './useUndoRedo';
 
 interface DrawingAppProps {
 	drawingTool: KonvaDrawingTool;
@@ -26,10 +28,8 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const [selectedTool, setSelectedTool] = useState<SHAPE_TYPE>(SHAPE_TYPE.RECT);
 	const [fillColor, setFillColor] = useState<string>(DEFAULT_FILL_COLOR);
 	const [strokeWidth, setStrokeWidth] = useState<number>(DEFAULT_STROKE_WIDTH);
-
-	const undoStack = useRef<KonvaShape[]>([]);
-
-	const redoStack = useRef<KonvaShape[]>([]);
+	const { add, undo, redo, undoLength, redoLength, lastItem, lastRemovedItem } =
+		useUndoRedo<KonvaShape>();
 
 	const handleToolChange = (tool: SHAPE_TYPE) => {
 		setSelectedTool(tool);
@@ -86,7 +86,8 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					}
 					drawingTool.addShape(shape);
 
-					undoStack.current.push(shape);
+					// undoStack.current.push(shape);
+					add(shape);
 
 					document.removeEventListener('mousemove', handleMouseMoveHandler);
 					document.removeEventListener('mouseup', handleMouseUpHandler);
@@ -146,7 +147,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					}
 					drawingTool.addShape(shape);
 
-					undoStack.current.push(shape);
+					add(shape);
 
 					document.removeEventListener('mousemove', handleMouseMove);
 					document.removeEventListener('mouseup', handleMouseUp);
@@ -168,7 +169,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					strokeWidth: strokeWidth,
 				});
 				drawingTool.addShape(shape);
-				undoStack.current.push(shape);
+				add(shape);
 
 				break;
 			}
@@ -184,7 +185,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 				});
 
 				drawingTool.addShape(shape);
-				undoStack.current.push(shape);
+				add(shape);
 
 				break;
 			}
@@ -192,21 +193,19 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	};
 
 	const handleUndo = () => {
-		if (undoStack.current.length > 0) {
-			const lastShape = undoStack.current.pop();
-			if (lastShape) {
-				drawingTool.removeShape(lastShape);
-				redoStack.current.push(lastShape);
+		if (undoLength > 0) {
+			if (lastItem) {
+				drawingTool.removeShape(lastItem);
+				undo();
 			}
 		}
 	};
 
 	const handleRedo = () => {
-		if (redoStack.current.length > 0) {
-			const lastRemovedShape = redoStack.current.pop();
-			if (lastRemovedShape) {
-				drawingTool.addShape(lastRemovedShape);
-				undoStack.current.push(lastRemovedShape);
+		if (redoLength > 0) {
+			if (lastRemovedItem) {
+				drawingTool.addShape(lastRemovedItem);
+				redo();
 			}
 		}
 	};
@@ -223,10 +222,18 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					onStrokeWidthChange={handleStrokeWidthChange}
 				/>
 				<div className={styles.undoRedoContainer}>
-					<button className={styles.undoRedoButton} onClick={handleUndo}>
+					<button
+						className={styles.undoRedoButton}
+						onClick={handleUndo}
+						disabled={!undoLength}
+					>
 						<Undo2 size={20} strokeWidth={2} />
 					</button>
-					<button className={styles.undoRedoButton} onClick={handleRedo}>
+					<button
+						className={styles.undoRedoButton}
+						onClick={handleRedo}
+						disabled={!redoLength}
+					>
 						<Redo2 size={20} strokeWidth={2} />
 					</button>
 				</div>
@@ -246,3 +253,16 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 };
 
 export default DrawingApp;
+
+// function newFunction(handleUndo: () => void, handleRedo: () => void) {
+// 	return (
+// 		<div className={styles.undoRedoContainer}>
+// 			<button className={styles.undoRedoButton} onClick={undo}>
+// 				<Undo2 size={20} strokeWidth={2} />
+// 			</button>
+// 			<button className={styles.undoRedoButton} onClick={handleRedo}>
+// 				<Redo2 size={20} strokeWidth={2} />
+// 			</button>
+// 		</div>
+// 	);
+// }
