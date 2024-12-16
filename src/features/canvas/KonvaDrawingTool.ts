@@ -79,23 +79,19 @@ export class KonvaDrawingTool implements DrawingTool {
 		return new KonvaShape(shape);
 	}
 
-	addShape(shape: Shape) {
+	addShapeToCanvas(shape: Shape, saveToStorage = true) {
 		if (shape instanceof KonvaShape) {
 			this.layer.add((shape as any).shape);
 
-			// 로컬스토리지에 도형 추가
-			this.shapeStorage.addShape({
-				id: shape.getId(),
-				type: shape.getKonvaShape().getClassName() as SHAPE_TYPE,
-				props: shape.getKonvaShape().getAttrs(),
-			});
-			//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+			if (saveToStorage) {
+				this.saveShapeToStorage(shape);
+			}
 
 			this.stage.add(this.layer);
 		}
 	}
 
-	removeShape(shape: Shape) {
+	removeShapeToCanvas(shape: Shape) {
 		if (shape instanceof KonvaShape) {
 			(shape as any).shape.remove();
 
@@ -104,10 +100,20 @@ export class KonvaDrawingTool implements DrawingTool {
 		}
 	}
 
-	clear() {
+	clearToCanvas() {
 		this.layer.destroyChildren();
 		this.shapeStorage.clearShapes();
 
 		this.layer.draw();
+	}
+
+	private saveShapeToStorage(shape: Shape) {
+		if (shape instanceof KonvaShape) {
+			this.shapeStorage.saveShape({
+				id: shape.getId(),
+				type: shape.getKonvaShape().getClassName() as SHAPE_TYPE,
+				props: shape.getKonvaShape().getAttrs(),
+			});
+		}
 	}
 }

@@ -61,7 +61,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					lineCap: 'round',
 					lineJoin: 'round',
 				});
-				drawingTool.addShape(tempShape);
+				drawingTool.addShapeToCanvas(tempShape);
 
 				const handleMouseMoveHandler = (moveEvent: MouseEvent) => {
 					const endX = moveEvent.clientX - rect.left;
@@ -82,11 +82,10 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					});
 
 					if (tempShape) {
-						drawingTool.removeShape(tempShape);
+						drawingTool.removeShapeToCanvas(tempShape);
 					}
-					drawingTool.addShape(shape);
+					drawingTool.addShapeToCanvas(shape);
 
-					// undoStack.current.push(shape);
 					add(shape);
 
 					document.removeEventListener('mousemove', handleMouseMoveHandler);
@@ -118,7 +117,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 							tension: 0.5,
 						});
 
-						drawingTool.addShape(tempShape);
+						drawingTool.addShapeToCanvas(tempShape);
 					}
 
 					if (points.length > 2) {
@@ -143,9 +142,9 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					});
 
 					if (tempShape) {
-						drawingTool.removeShape(tempShape);
+						drawingTool.removeShapeToCanvas(tempShape);
 					}
-					drawingTool.addShape(shape);
+					drawingTool.addShapeToCanvas(shape);
 
 					add(shape);
 
@@ -168,7 +167,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					stroke: DEFAULT_STROKE_COLOR,
 					strokeWidth: strokeWidth,
 				});
-				drawingTool.addShape(shape);
+				drawingTool.addShapeToCanvas(shape);
 				add(shape);
 
 				break;
@@ -184,7 +183,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					strokeWidth: strokeWidth,
 				});
 
-				drawingTool.addShape(shape);
+				drawingTool.addShapeToCanvas(shape);
 				add(shape);
 
 				break;
@@ -195,7 +194,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const handleUndo = () => {
 		if (undoLength > 0) {
 			if (lastItem) {
-				drawingTool.removeShape(lastItem);
+				drawingTool.removeShapeToCanvas(lastItem);
 				undo();
 			}
 		}
@@ -204,7 +203,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const handleRedo = () => {
 		if (redoLength > 0) {
 			if (lastRemovedItem) {
-				drawingTool.addShape(lastRemovedItem);
+				drawingTool.addShapeToCanvas(lastRemovedItem);
 				redo();
 			}
 		}

@@ -7,9 +7,9 @@ export interface Shape {
 
 export interface DrawingTool {
 	createShape(type: string, props: ShapeConfig): Shape;
-	addShape(shape: Shape): void;
-	removeShape(shape: Shape): void;
-	clear(): void;
+	addShapeToCanvas(shape: Shape, saveToStorage: boolean): void;
+	removeShapeToCanvas(shape: Shape): void;
+	clearToCanvas(): void;
 }
 
 export enum SHAPE_TYPE {
