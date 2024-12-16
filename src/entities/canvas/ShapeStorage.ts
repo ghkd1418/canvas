@@ -4,7 +4,6 @@ import type { SHAPE_TYPE } from './types';
 interface ShapeData {
 	id: string;
 	type: SHAPE_TYPE;
-	props: any;
 }
 
 const KEY = 'SHAPE_STORAGE';
@@ -15,7 +14,7 @@ export class ShapeStorage extends BaseStorage<ShapeData[]> {
 	}
 
 	addShape(shape: ShapeData) {
-		const shapes = this.getData() || [];
+		const shapes = this.getData() ?? [];
 		shapes.push(shape);
 		this.setData(shapes);
 	}

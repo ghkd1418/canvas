@@ -7,7 +7,7 @@ export class BaseStorage<T> {
 		this.#storage = storage;
 	}
 
-	getData(): T {
+	getData(): T | null {
 		return JSON.parse(this.#storage.getItem(this.#key) || 'null');
 	}
 
