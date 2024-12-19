@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
+
 import { Redo2, Undo2 } from 'lucide-react';
 
 import { SHAPE_TYPE } from '../../entities/canvas/types';
-import Toolbar from './ToolBar';
-
-import * as styles from '@/features/canvas/drawing.css';
-
 import type { KonvaDrawingTool } from './KonvaDrawingTool';
 import type { KonvaShape } from './KonvaShape';
+import Toolbar from './ToolBar';
+import useHistory from './useUndoRedo';
 
-import useUndoRedo from './useUndoRedo';
+import * as styles from '@/features/canvas/drawing.css';
 
 interface DrawingAppProps {
 	drawingTool: KonvaDrawingTool;
@@ -28,8 +27,8 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	const [selectedTool, setSelectedTool] = useState<SHAPE_TYPE>(SHAPE_TYPE.RECT);
 	const [fillColor, setFillColor] = useState<string>(DEFAULT_FILL_COLOR);
 	const [strokeWidth, setStrokeWidth] = useState<number>(DEFAULT_STROKE_WIDTH);
-	const { add, undo, redo, undoLength, redoLength, lastItem, lastRemovedItem } =
-		useUndoRedo<KonvaShape>();
+
+	const { addState, undo, redo, canRedo, canUndo } = useHistory<KonvaShape>();
 
 	const handleToolChange = (tool: SHAPE_TYPE) => {
 		setSelectedTool(tool);
@@ -86,7 +85,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					}
 					drawingTool.addShapeToCanvas(shape);
 
-					add(shape);
+					addState(shape);
 
 					document.removeEventListener('mousemove', handleMouseMoveHandler);
 					document.removeEventListener('mouseup', handleMouseUpHandler);
@@ -146,7 +145,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					}
 					drawingTool.addShapeToCanvas(shape);
 
-					add(shape);
+					addState(shape);
 
 					document.removeEventListener('mousemove', handleMouseMove);
 					document.removeEventListener('mouseup', handleMouseUp);
@@ -168,7 +167,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					strokeWidth: strokeWidth,
 				});
 				drawingTool.addShapeToCanvas(shape);
-				add(shape);
+				addState(shape);
 
 				break;
 			}
@@ -184,7 +183,7 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 				});
 
 				drawingTool.addShapeToCanvas(shape);
-				add(shape);
+				addState(shape);
 
 				break;
 			}
@@ -192,19 +191,21 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 	};
 
 	const handleUndo = () => {
-		if (undoLength > 0) {
-			if (lastItem) {
-				drawingTool.removeShapeToCanvas(lastItem);
-				undo();
+		if (canUndo) {
+			const lastAddedItem = undo();
+
+			if (lastAddedItem) {
+				drawingTool.removeShapeToCanvas(lastAddedItem);
 			}
 		}
 	};
 
 	const handleRedo = () => {
-		if (redoLength > 0) {
+		if (canRedo) {
+			const lastRemovedItem = redo();
+
 			if (lastRemovedItem) {
 				drawingTool.addShapeToCanvas(lastRemovedItem);
-				redo();
 			}
 		}
 	};
@@ -224,14 +225,14 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 					<button
 						className={styles.undoRedoButton}
 						onClick={handleUndo}
-						disabled={!undoLength}
+						disabled={!canUndo}
 					>
 						<Undo2 size={20} strokeWidth={2} />
 					</button>
 					<button
 						className={styles.undoRedoButton}
 						onClick={handleRedo}
-						disabled={!redoLength}
+						disabled={!canRedo}
 					>
 						<Redo2 size={20} strokeWidth={2} />
 					</button>
@@ -252,16 +253,3 @@ const DrawingApp = ({ containerRef, drawingTool }: DrawingAppProps) => {
 };
 
 export default DrawingApp;
-
-// function newFunction(handleUndo: () => void, handleRedo: () => void) {
-// 	return (
-// 		<div className={styles.undoRedoContainer}>
-// 			<button className={styles.undoRedoButton} onClick={undo}>
-// 				<Undo2 size={20} strokeWidth={2} />
-// 			</button>
-// 			<button className={styles.undoRedoButton} onClick={handleRedo}>
-// 				<Redo2 size={20} strokeWidth={2} />
-// 			</button>
-// 		</div>
-// 	);
-// }

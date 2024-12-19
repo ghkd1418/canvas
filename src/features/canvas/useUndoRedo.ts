@@ -1,60 +1,66 @@
-import useHistoryState from './useHistoryState';
+import { useRef, useState } from 'react';
 
-interface UndoRedoState<T> {
-	add: (item: T) => void;
-	undo: () => T | undefined;
-	redo: () => T | undefined;
-	undoLength: number;
-	redoLength: number;
-	lastItem: T | undefined;
-	lastRemovedItem: T | undefined;
+interface UseHistory<T> {
+	addState: (newState: T) => void;
+	undo: () => T | null;
+	redo: () => T | null;
+	clearHistory: () => void;
+	canUndo: boolean;
+	canRedo: boolean;
 }
 
-function useUndoRedo<T>(): UndoRedoState<T> {
-	const undoHistory = useHistoryState<T>();
-	const redoHistory = useHistoryState<T>();
+function useHistory<T>(): UseHistory<T> {
+	const undoStack = useRef<T[]>([]);
+	const redoStack = useRef<T[]>([]);
 
-	const add = (item: T) => {
-		undoHistory.addHistory(item);
-		redoHistory.clear();
+	const [canUndo, setCanUndo] = useState(false);
+	const [canRedo, setCanRedo] = useState(false);
+
+	const updateHistoryState = () => {
+		setCanUndo(undoStack.current.length > 0);
+		setCanRedo(redoStack.current.length > 0);
+	};
+
+	const addState = (newState: T) => {
+		undoStack.current.push(newState);
+		redoStack.current = [];
+
+		updateHistoryState();
 	};
 
 	const undo = () => {
-		try {
-			const lastItem = undoHistory.removeHistory();
-			if (lastItem !== undefined) {
-				redoHistory.addHistory(lastItem);
-			}
-			return lastItem;
-		} catch (error) {
-			console.warn('Cannot undo: ', error);
-			return undefined;
-		}
+		if (undoStack.current.length === 0) return null;
+		const prevState = undoStack.current.pop() as T;
+		redoStack.current.push(prevState);
+		updateHistoryState();
+
+		return prevState;
 	};
 
 	const redo = () => {
-		try {
-			const lastUndoneItem = redoHistory.removeHistory();
-			if (lastUndoneItem !== undefined) {
-				undoHistory.addHistory(lastUndoneItem);
-			}
-			return lastUndoneItem;
-		} catch (error) {
-			console.warn('Cannot redo: ', error);
-			return undefined;
-		}
+		if (redoStack.current.length === 0) return null;
+		const nextState = redoStack.current.pop() as T;
+		undoStack.current.push(nextState);
+		updateHistoryState();
+
+		return nextState;
+	};
+
+	const clearHistory = () => {
+		undoStack.current = [];
+		redoStack.current = [];
+
+		updateHistoryState();
 	};
 
 	return {
-		add,
+		addState,
 		undo,
 		redo,
-		undoLength: undoHistory.length,
-		redoLength: redoHistory.length,
-		lastItem: undoHistory.length > 0 ? undoHistory.peekHistory() : undefined,
-		lastRemovedItem:
-			redoHistory.length > 0 ? redoHistory.peekHistory() : undefined,
+		clearHistory,
+		canRedo,
+		canUndo,
 	};
 }
 
-export default useUndoRedo;
+export default useHistory;

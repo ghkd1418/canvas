@@ -1,21 +1,18 @@
+import { ShapeStorage } from '@/entities/canvas/ShapeStorage';
 import Konva from 'konva';
-import { SHAPE_TYPE } from '../../entities/canvas/types';
-
-import type { DrawingTool, Shape } from '../../entities/canvas/types';
-import type { RectConfig } from 'konva/lib/shapes/Rect';
 import type { ShapeConfig } from 'konva/lib/Shape';
-
 import type { CircleConfig } from 'konva/lib/shapes/Circle';
 import type { LineConfig } from 'konva/lib/shapes/Line';
+import type { RectConfig } from 'konva/lib/shapes/Rect';
 import type { RegularPolygonConfig } from 'konva/lib/shapes/RegularPolygon';
 
+import { SHAPE_TYPE } from '../../entities/canvas/types';
+import type { DrawingTool, Shape } from '../../entities/canvas/types';
 import { KonvaShape } from './KonvaShape';
-import { ShapeStorage } from '@/entities/canvas/ShapeStorage';
 
 export class KonvaDrawingTool implements DrawingTool {
 	private stage: Konva.Stage;
 	private layer: Konva.Layer;
-
 	private shapeStorage: ShapeStorage;
 
 	constructor(container: string | HTMLDivElement) {
@@ -25,30 +22,30 @@ export class KonvaDrawingTool implements DrawingTool {
 			height: window.innerHeight * 0.8,
 		});
 		this.layer = new Konva.Layer();
-
 		this.shapeStorage = new ShapeStorage();
 
-		/**
-		 * @description 로컬 스토리지에서 도형 복원
-		 */
+		// 스토리지에서 도형 복원
+		this.restoreShapes();
+	}
+
+	private restoreShapes() {
 		const savedShapes = this.shapeStorage.getData();
 
 		if (savedShapes) {
 			savedShapes.forEach(({ type, props }) => {
-				const normalizedType = type.toLowerCase(); // 대소문자 무시
-
-				let shape: KonvaShape;
-
-				try {
-					shape = this.createShape(normalizedType as SHAPE_TYPE, props);
-
-					this.layer.add((shape as any).shape);
-
-					this.stage.add(this.layer);
-				} catch (error) {
-					console.warn('도형 생성 중 오류 발생:', error);
-				}
+				const normalizedType = type.toLowerCase() as SHAPE_TYPE;
+				this.createAndAddShape(normalizedType, props);
 			});
+		}
+	}
+
+	private createAndAddShape(type: SHAPE_TYPE, props: ShapeConfig) {
+		try {
+			const shape = this.createShape(type, props);
+			this.layer.add(shape.getKonvaShape());
+			this.stage.add(this.layer);
+		} catch (error) {
+			console.warn('도형 생성 중 오류 발생:', error);
 		}
 	}
 
@@ -81,7 +78,7 @@ export class KonvaDrawingTool implements DrawingTool {
 
 	addShapeToCanvas(shape: Shape, saveToStorage = true) {
 		if (shape instanceof KonvaShape) {
-			this.layer.add((shape as any).shape);
+			this.layer.add(shape.getKonvaShape());
 
 			if (saveToStorage) {
 				this.saveShapeToStorage(shape);
@@ -93,7 +90,7 @@ export class KonvaDrawingTool implements DrawingTool {
 
 	removeShapeToCanvas(shape: Shape) {
 		if (shape instanceof KonvaShape) {
-			(shape as any).shape.remove();
+			shape.getKonvaShape().remove();
 
 			// 로컬스토리지에 도형 제거
 			this.shapeStorage.removeShape(shape.getId());

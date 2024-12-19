@@ -1,4 +1,5 @@
 import { createVar, style } from '@vanilla-extract/css';
+
 import { button } from '@/shared/styles/button.css';
 import { sprinkles } from '@/shared/styles/sprinkles.css';
 import { vars } from '@/shared/styles/vars.css';
@@ -7,6 +8,7 @@ export const canvas = style([
 	sprinkles({
 		paddingY: '8x',
 	}),
+	{ marginLeft: 'auto', marginRight: 'auto', width: 'fit-content' },
 ]);
 
 export const stage = style([

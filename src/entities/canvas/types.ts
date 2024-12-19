@@ -22,5 +22,6 @@ export enum SHAPE_TYPE {
 
 export interface ShapeData {
 	type: SHAPE_TYPE;
-	props: any;
+	props: ShapeConfig;
+	id: string;
 }

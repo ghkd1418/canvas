@@ -1,22 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
+
 import DrawingApp from '@/features/canvas/DrawingApp';
 import { KonvaDrawingTool } from '@/features/canvas/KonvaDrawingTool';
 
 function Home() {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const [drawingTool, setDrawingTool] = useState<KonvaDrawingTool>(null);
+	const [drawingTool, setDrawingTool] = useState<KonvaDrawingTool | null>(null);
 
 	useEffect(() => {
-		if (containerRef.current && !drawingTool) {
-			const newDrawingTool = new KonvaDrawingTool(containerRef.current);
-
-			setDrawingTool(newDrawingTool);
+		if (containerRef.current) {
+			const tool = new KonvaDrawingTool(containerRef.current);
+			setDrawingTool(tool);
 		}
-	}, [drawingTool]);
+	}, []);
 
-	if (!drawingTool) <>loading...</>;
-
-	return <DrawingApp containerRef={containerRef} drawingTool={drawingTool} />;
+	return <DrawingApp containerRef={containerRef} drawingTool={drawingTool!} />;
 }
 
 export default Home;

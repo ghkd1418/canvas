@@ -1,12 +1,6 @@
 import { BaseStorage } from '@/shared/utils/baseStorage';
-import type { SHAPE_TYPE } from './types';
-import type { ShapeConfig } from 'konva/lib/Shape';
 
-interface ShapeData {
-	id: string;
-	type: SHAPE_TYPE;
-	props: ShapeConfig;
-}
+import type { ShapeData } from './types';
 
 const KEY = 'SHAPE_STORAGE';
 
@@ -17,6 +11,7 @@ export class ShapeStorage extends BaseStorage<ShapeData[]> {
 
 	saveShape(shape: ShapeData) {
 		const shapes = this.getData() ?? [];
+
 		shapes.push(shape);
 		this.setData(shapes);
 	}
