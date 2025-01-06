@@ -1,3 +1,4 @@
+import type { ShapeProps } from '@/features/canvas/types';
 import type { ShapeConfig } from 'konva/lib/Shape';
 
 export interface Shape {
@@ -12,16 +13,20 @@ export interface DrawingTool {
 	clearToCanvas(): void;
 }
 
-export enum SHAPE_TYPE {
-	RECT = 'rect',
-	CIRCLE = 'circle',
-	POLYGON = 'regularpolygon',
-	LINE = 'line',
-	CURVE = 'curve',
+export interface ShapeData extends ShapeProps {
+	id: string;
 }
 
-export interface ShapeData {
-	type: SHAPE_TYPE;
-	props: ShapeConfig;
-	id: string;
+export const SHAPE_TYPE = {
+	RECTANGLE: 'rectangle',
+	CIRCLE: 'circle',
+	REGULAR_POLYGON: 'regularpolygon',
+	LINE: 'line',
+	CURVE: 'curve',
+} as const;
+
+export type ShapeType = (typeof SHAPE_TYPE)[keyof typeof SHAPE_TYPE];
+
+export interface Memento {
+	stageState: string;
 }

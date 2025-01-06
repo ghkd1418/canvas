@@ -1,6 +1,5 @@
-import Konva from 'konva';
-
 import type { Shape } from '@/entities/canvas/types';
+import Konva from 'konva';
 
 export class KonvaShape implements Shape {
 	private shape: Konva.Shape;
@@ -15,18 +14,12 @@ export class KonvaShape implements Shape {
 		return 'shape-' + Math.random().toString(36).substring(2, 9);
 	}
 
-	getId() {
-		return this.id;
-	}
-
-	getKonvaShape() {
-		return this.shape;
-	}
-
 	draw() {
 		if (this.shape.getLayer()) {
-			this.shape.getLayer()!.add(this.shape);
-			this.shape.getLayer()!.draw();
+			const layer = this.shape.getLayer()!;
+
+			layer.add(this.shape);
+			layer.draw();
 		}
 	}
 
